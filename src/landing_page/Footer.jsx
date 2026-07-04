@@ -2,7 +2,7 @@ import React from "react";
 
 function Footer() {
   return (
-    <footer className="container ">
+    <footer className="container border-top">
       {/* Top Section */}
       <div className="row my-4 ">
         {/* Logo */}

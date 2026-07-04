@@ -38,3 +38,35 @@ footer p {
 .list-inline-item:hover {
   color: #387ed1;
 }
+.table tbody tr,
+.table thead tr,
+.table td,
+.table th {
+  border: none;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  color: #424242;
+  font-size: 14px;
+  margin-left: 20px;
+}
+
+.flag{
+    display: inline-block;
+    padding: 5px 20px 5px 15px;
+    border-left: 4px solid #387ed1;
+    background: #f6fafd;
+    border-radius: 2px;
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+.supportInput{
+  outline: none;
+  padding: 0.75rem;
+  width:100%;
+  border:none;
+}
