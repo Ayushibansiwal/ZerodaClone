@@ -1,49 +1,169 @@
 import React from "react";
 import { positions } from "../data/data";
 
-const Positions = () => {
-  return (
-    <>
-      <h3 className="title">Positions (2)</h3>
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 
-      <div className="order-table">
+const Positions = () => {
+  const invested = positions.reduce(
+    (acc, stock) => acc + stock.avg * stock.qty,
+    0
+  );
+
+  const current = positions.reduce(
+    (acc, stock) => acc + stock.price * stock.qty,
+    0
+  );
+
+  const pnl = current - invested;
+
+  return (
+    <div className="positions-container">
+
+      {/* Header */}
+
+      <div className="positions-header">
+        <div>
+          <h2>Positions</h2>
+          <p>{positions.length} Active Positions</p>
+        </div>
+
+        <button className="exit-all-btn">
+          Exit All Positions
+        </button>
+      </div>
+
+      {/* Cards */}
+
+      <div className="position-cards">
+
+        <div className="position-card">
+          <h5>Investment</h5>
+          <h2>₹{invested.toFixed(2)}</h2>
+        </div>
+
+        <div className="position-card">
+          <h5>Current Value</h5>
+          <h2>₹{current.toFixed(2)}</h2>
+        </div>
+
+        <div className="position-card">
+          <h5>Total P&L</h5>
+
+          <h2 className={pnl >= 0 ? "profit" : "loss"}>
+
+            {pnl >= 0 ?
+              <TrendingUpIcon /> :
+              <TrendingDownIcon />
+            }
+
+            ₹{Math.abs(pnl).toFixed(2)}
+
+          </h2>
+        </div>
+
+      </div>
+
+      {/* Table */}
+
+      <div className="positions-table">
+
         <table>
+
           <thead>
+
             <tr>
               <th>Product</th>
               <th>Instrument</th>
-              <th>Qty.</th>
-              <th>Avg.</th>
+              <th>Qty</th>
+              <th>Avg Price</th>
               <th>LTP</th>
               <th>P&L</th>
-              <th>Chg.</th>
+              <th>Today's Change</th>
             </tr>
+
           </thead>
+
           <tbody>
+
             {positions.map((stock, index) => {
-              const curValue = stock.price * stock.qty;
-              const isProfit = curValue - stock.avg * stock.qty >= 0.0;
-              const profClass = isProfit ? "profit" : "loss";
-              const dayClass = stock.isLoss ? "loss" : "profit";
+
+              const investment =
+                stock.avg * stock.qty;
+
+              const current =
+                stock.price * stock.qty;
+
+              const profit =
+                current - investment;
 
               return (
+
                 <tr key={index}>
-                  <td>{stock.product}</td>
-                  <td>{stock.name}</td>
-                  <td>{stock.qty}</td>
-                  <td>{stock.avg.toFixed(2)}</td>
-                  <td>{stock.price.toFixed(2)}</td>
-                  <td className={profClass}>
-                    {(curValue - stock.avg * stock.qty).toFixed(2)}
+
+                  <td>
+
+                    <span className="product-badge">
+                      {stock.product}
+                    </span>
+
                   </td>
-                  <td className={dayClass}>{stock.day}</td>
+
+                  <td>
+
+                    <div className="instrument">
+
+                      <strong>
+                        {stock.name}
+                      </strong>
+
+                      <small>
+                        NSE
+                      </small>
+
+                    </div>
+
+                  </td>
+
+                  <td>{stock.qty}</td>
+
+                  <td>₹{stock.avg.toFixed(2)}</td>
+
+                  <td>₹{stock.price.toFixed(2)}</td>
+
+                  <td
+                    className={
+                      profit >= 0
+                        ? "profit"
+                        : "loss"
+                    }
+                  >
+                    ₹{profit.toFixed(2)}
+                  </td>
+
+                  <td
+                    className={
+                      stock.isLoss
+                        ? "loss"
+                        : "profit"
+                    }
+                  >
+                    {stock.day}
+                  </td>
+
                 </tr>
+
               );
+
             })}
+
           </tbody>
+
         </table>
+
       </div>
-    </>
+
+    </div>
   );
 };
 

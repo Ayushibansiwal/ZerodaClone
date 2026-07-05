@@ -1,92 +1,104 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-function Menu() {
-  const [selectedMenu, setSelectedMenu] = useState(0);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
+import CandlestickChartOutlinedIcon from "@mui/icons-material/CandlestickChartOutlined";
+import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
+import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
+import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 
-  function hanldeClick(idx) {
-    setSelectedMenu(idx);
-  }
+const Menu = () => {
+  const location = useLocation();
 
-  function handleProfileDropdown() {
-    setIsProfileDropdownOpen(!isProfileDropdownOpen);
-  }
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  const menuClass = "menu";
-  const activeMenuClass = "menu selected";
+  const menus = [
+    {
+      name: "Dashboard",
+      path: "/",
+      icon: <DashboardOutlinedIcon fontSize="small" />,
+    },
+    {
+      name: "Orders",
+      path: "/orders",
+      icon: <ReceiptLongOutlinedIcon fontSize="small" />,
+    },
+    {
+      name: "Holdings",
+      path: "/holdings",
+      icon: <AccountBalanceWalletOutlinedIcon fontSize="small" />,
+    },
+    {
+      name: "Positions",
+      path: "/positions",
+      icon: <CandlestickChartOutlinedIcon fontSize="small" />,
+    },
+    {
+      name: "Funds",
+      path: "/funds",
+      icon: <SavingsOutlinedIcon fontSize="small" />,
+    },
+    {
+      name: "Apps",
+      path: "/apps",
+      icon: <AppsOutlinedIcon fontSize="small" />,
+    },
+  ];
 
   return (
-    <div className="menu-container">
-      <img src="logo.png" style={{ width: "50px" }} />
-      <div className="menus">
-        <ul>
-          <li>
-            <Link
-              to="/"
-              className="text-decoration-none"
-              onClick={() => hanldeClick(0)}
-            >
-              {" "}
-              <p className={selectedMenu === 0 ? activeMenuClass : menuClass}>Dashboard</p>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/orders"
-              className="text-decoration-none"
-              onClick={() => hanldeClick(1)}
-            >
-              <p className={selectedMenu === 1 ? activeMenuClass : menuClass}>Orders</p>
-            </Link>
-          </li>
-          <li>
-            <Link 
-              to="/holdings" className="text-decoration-none"
-              onClick={()=> hanldeClick(2)}>
-              {" "}
-              <p className={selectedMenu === 2 ? activeMenuClass : menuClass}>Holdings</p>
-            </Link>
-          </li>
-          <li>
-            <Link 
-              to="/positions" className="text-decoration-none"
-              onClick={()=> hanldeClick(3)}>
-              {" "}
-              <p className={selectedMenu === 3 ? activeMenuClass : menuClass}>Positions</p>
-            </Link>
-          </li>
-          <li>
-            <Link 
-              to="/funds" 
-              className="text-decoration-none"
-              onClick={()=> hanldeClick(4)}>
-              {" "}
-              <p className={selectedMenu === 4 ? activeMenuClass : menuClass}>Funds</p>
-            </Link>
-          </li>
-          <li>
-            <Link 
-              to="/apps" 
-              className="text-decoration-none"
-              onClick={()=> hanldeClick(5)}>
-              {" "}
-              <p className={selectedMenu === 5 ? activeMenuClass : menuClass}>Apps</p>
-            </Link>
-          </li>
-        </ul>
+    <header className="menu-container">
+      <div className="logo-section">
+        <img src="/logo.png" alt="Logo" className="logo" />
 
-        <div className="profile" onClick={handleProfileDropdown}>
-          <div className="avatar">ZU</div>
-          <p className="username">USERID</p>
+        <h4>TradeDesk</h4>
+      </div>
+
+      <nav className="nav-links">
+        {menus.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`nav-item ${
+              location.pathname === item.path ? "active" : ""
+            }`}
+          >
+            {item.icon}
+            <span>{item.name}</span>
+          </Link>
+        ))}
+      </nav>
+
+      <div
+        className="profile-section"
+        onClick={() => setProfileOpen(!profileOpen)}
+      >
+        <div className="avatar">
+          A
         </div>
 
-          {/* Profile DropDown */}
+        <div className="profile-info">
+          <h5>Ayushi</h5>
+          <small>Investor</small>
+        </div>
 
+        <KeyboardArrowDownOutlinedIcon
+          className={`arrow ${profileOpen ? "rotate" : ""}`}
+        />
 
+        {profileOpen && (
+          <div className="profile-dropdown">
+            <p>My Profile</p>
+            <p>Settings</p>
+            <p>Reports</p>
+            <hr />
+            <p className="logout">Logout</p>
+          </div>
+        )}
       </div>
-    </div>
+    </header>
   );
-}
+};
 
 export default Menu;

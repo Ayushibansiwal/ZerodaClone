@@ -1,63 +1,98 @@
 import React from "react";
 
+import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
+import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
+import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
+
 const Summary = () => {
   return (
-    <>
-      <div className="username">
-        <h6>Hi, User!</h6>
-        <hr className="divider" />
-      </div>
+    <div className="summary-container">
 
-      <div className="section">
-        <span>
-          <p>Equity</p>
-        </span>
+      {/* Welcome Section */}
 
-        <div className="data">
-          <div className="first">
-            <h3>3.74k</h3>
-            <p>Margin available</p>
-          </div>
-          <hr />
-
-          <div className="second">
-            <p>
-              Margins used <span>0</span>{" "}
-            </p>
-            <p>
-              Opening balance <span>3.74k</span>{" "}
-            </p>
-          </div>
+      <div className="welcome-card">
+        <div>
+          <h2>Good Morning, Ayushi 👋</h2>
+          <p>Here's a quick overview of your portfolio today.</p>
         </div>
-        <hr className="divider" />
-      </div>
 
-      <div className="section">
-        <span>
-          <p>Holdings (13)</p>
-        </span>
-
-        <div className="data">
-          <div className="first">
-            <h3 className="profit">
-              1.55k <small>+5.20%</small>{" "}
-            </h3>
-            <p>P&L</p>
-          </div>
-          <hr />
-
-          <div className="second">
-            <p>
-              Current Value <span>31.43k</span>{" "}
-            </p>
-            <p>
-              Investment <span>29.88k</span>{" "}
-            </p>
-          </div>
+        <div className="market-status">
+          <span className="live-dot"></span>
+          Market Open
         </div>
-        <hr className="divider" />
       </div>
-    </>
+
+      {/* Summary Cards */}
+
+      <div className="summary-grid">
+
+        <div className="summary-card">
+          <div className="card-icon blue">
+            <AccountBalanceWalletOutlinedIcon />
+          </div>
+
+          <h5>Available Margin</h5>
+
+          <h2>₹3,740</h2>
+
+          <small>Opening Balance ₹3,740</small>
+        </div>
+
+        <div className="summary-card">
+          <div className="card-icon green">
+            <TrendingUpOutlinedIcon />
+          </div>
+
+          <h5>Total Holdings</h5>
+
+          <h2 className="profit">
+            ₹1,553
+          </h2>
+
+          <small>+5.20% Overall Profit</small>
+        </div>
+
+        <div className="summary-card">
+          <div className="card-icon orange">
+            <SavingsOutlinedIcon />
+          </div>
+
+          <h5>Current Value</h5>
+
+          <h2>₹31,429</h2>
+
+          <small>Investment ₹29,876</small>
+        </div>
+
+      </div>
+
+      {/* Portfolio Card */}
+
+      <div className="portfolio-card">
+
+        <div className="portfolio-row">
+          <span>Total Investment</span>
+
+          <strong>₹29,876</strong>
+        </div>
+
+        <div className="portfolio-row">
+          <span>Current Value</span>
+
+          <strong>₹31,429</strong>
+        </div>
+
+        <div className="portfolio-row">
+          <span>Today's Profit</span>
+
+          <strong className="profit">
+            +₹1,553 (+5.20%)
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
   );
 };
 
