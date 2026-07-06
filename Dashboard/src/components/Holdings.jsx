@@ -1,10 +1,19 @@
-import React from "react";
+import React ,{useState,useEffect} from "react";
 import { holdings } from "../data/data";
 
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 
+import axios from "axios";
+
 const Holdings = () => {
+  const [allHoldings,setAllHoldings] = useState([]);
+  useEffect(()=>{
+    axios.get("http://localhost:8000/allHoldings")
+    .then((res)=>{
+      setAllHoldings(res.data);
+    })
+  },[]);
   const totalInvestment = holdings.reduce(
     (acc, stock) => acc + stock.avg * stock.qty,
     0
@@ -25,7 +34,7 @@ const Holdings = () => {
       <div className="holdings-header">
         <div>
           <h2>Holdings</h2>
-          <p>{holdings.length} Stocks in your portfolio</p>
+          <p>{allHoldings.length} Stocks in your portfolio</p>
         </div>
 
         <button className="download-btn">
@@ -90,7 +99,7 @@ const Holdings = () => {
 
           <tbody>
 
-            {holdings.map((stock, index) => {
+            {allHoldings.map((stock, index) => {
 
               const investment = stock.avg * stock.qty;
               const current = stock.price * stock.qty;

@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import cors from "cors";
 
 // Models
 import HoldingsModel from "./models/HoldingsModel.js";
@@ -20,36 +22,17 @@ async function main() {
     console.log("✅ Database connected successfully.");
 }
 
-// Route | Work with Dummy Data 
-app.get("/addPositions",async(req,res)=>{
-    const positions = [
-  {
-    product: "CNC",
-    name: "EVEREADY",
-    qty: 2,
-    avg: 316.27,
-    price: 312.35,
-    net: "+0.58%",
-    day: "-1.24%",
-    isLoss: true,
-  },
-  {
-    product: "CNC",
-    name: "JUBLFOOD",
-    qty: 1,
-    avg: 3124.75,
-    price: 3082.65,
-    net: "+10.04%",
-    day: "-1.35%",
-    isLoss: true,
-  },
-]
-   try {
-       await PositionModel.insertMany(positions);
-        res.send("positions added successfully!");
-   } catch (error) {
-    console.log(error);
-   }
+app.use(cors());
+app.use(bodyParser.json());
+
+// Fetching Data from DB
+app.get("/allHoldings",async(req,res)=>{
+    const allHoldings = await HoldingsModel.find();
+    res.send(allHoldings);
+})
+app.get("/allPositions",async(req,res)=>{
+    const allPositions = await PositionModel.find();
+    res.send(allPositions);
 })
 
 

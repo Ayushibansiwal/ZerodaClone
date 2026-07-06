@@ -3,8 +3,18 @@ import { positions } from "../data/data";
 
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import { useState } from "react";
+import { useEffect } from "react";
+import axios from "axios";
 
 const Positions = () => {
+  const [allPositions, setAllPositions] = useState([]);
+  useEffect(()=>{
+    axios.get("http://localhost:8000/allPositions")
+    .then((res)=>{
+        setAllPositions(res.data);
+    });
+  },[]);
   const invested = positions.reduce(
     (acc, stock) => acc + stock.avg * stock.qty,
     0
@@ -25,7 +35,7 @@ const Positions = () => {
       <div className="positions-header">
         <div>
           <h2>Positions</h2>
-          <p>{positions.length} Active Positions</p>
+          <p>{allPositions.length} Active Positions</p>
         </div>
 
         <button className="exit-all-btn">
@@ -86,7 +96,7 @@ const Positions = () => {
 
           <tbody>
 
-            {positions.map((stock, index) => {
+            {allPositions.map((stock, index) => {
 
               const investment =
                 stock.avg * stock.qty;
