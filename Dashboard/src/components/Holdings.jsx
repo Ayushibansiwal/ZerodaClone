@@ -1,89 +1,59 @@
-import React ,{useState,useEffect} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { holdings } from "../data/data";
+import GeneralContext from "./GeneralContext"; // 1. Import Context
 
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-
 import axios from "axios";
 
 const Holdings = () => {
-  const [allHoldings,setAllHoldings] = useState([]);
-  useEffect(()=>{
-    axios.get("http://localhost:8000/allHoldings")
-    .then((res)=>{
+  const [allHoldings, setAllHoldings] = useState([]);
+  const [hoveredRow, setHoveredRow] = useState(null); // State to track which row is hovered
+  
+  const { openBuyWindow, openSellWindow } = useContext(GeneralContext); // 2. Use Context functions
+
+  useEffect(() => {
+    axios.get("http://localhost:8000/allHoldings").then((res) => {
       setAllHoldings(res.data);
-    })
-  },[]);
-  const totalInvestment = holdings.reduce(
-    (acc, stock) => acc + stock.avg * stock.qty,
-    0
-  );
+    });
+  }, []);
 
-  const currentValue = holdings.reduce(
-    (acc, stock) => acc + stock.price * stock.qty,
-    0
-  );
-
+  const totalInvestment = holdings.reduce((acc, stock) => acc + stock.avg * stock.qty, 0);
+  const currentValue = holdings.reduce((acc, stock) => acc + stock.price * stock.qty, 0);
   const totalPnL = currentValue - totalInvestment;
   const totalPercent = ((totalPnL / totalInvestment) * 100).toFixed(2);
 
   return (
     <div className="holdings-container">
-      {/* Header */}
-
       <div className="holdings-header">
         <div>
           <h2>Holdings</h2>
           <p>{allHoldings.length} Stocks in your portfolio</p>
         </div>
-
-        <button className="download-btn">
-          Download Report
-        </button>
+        <button className="download-btn">Download Report</button>
       </div>
 
-      {/* Summary */}
-
       <div className="holding-summary">
-
         <div className="summary-box">
           <h5>Investment</h5>
           <h3>₹{totalInvestment.toFixed(2)}</h3>
         </div>
-
         <div className="summary-box">
           <h5>Current Value</h5>
           <h3>₹{currentValue.toFixed(2)}</h3>
         </div>
-
         <div className="summary-box">
           <h5>Total P&L</h5>
-
           <h3 className={totalPnL >= 0 ? "profit" : "loss"}>
-            {totalPnL >= 0 ? (
-              <TrendingUpIcon />
-            ) : (
-              <TrendingDownIcon />
-            )}
-
+            {totalPnL >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
             ₹{Math.abs(totalPnL).toFixed(2)}
           </h3>
-
-          <small
-            className={totalPnL >= 0 ? "profit" : "loss"}
-          >
-            {totalPercent}%
-          </small>
+          <small className={totalPnL >= 0 ? "profit" : "loss"}>{totalPercent}%</small>
         </div>
-
       </div>
 
-      {/* Table */}
-
       <div className="holdings-table">
-
         <table>
-
           <thead>
             <tr>
               <th>Stock</th>
@@ -96,83 +66,56 @@ const Holdings = () => {
               <th>Day Change</th>
             </tr>
           </thead>
-
           <tbody>
-
             {allHoldings.map((stock, index) => {
-
               const investment = stock.avg * stock.qty;
               const current = stock.price * stock.qty;
               const pnl = current - investment;
 
               return (
-
-                <tr key={index}>
-
+                <tr
+                  key={index}
+                  onMouseEnter={() => setHoveredRow(index)} // Track hover entry
+                  onMouseLeave={() => setHoveredRow(null)}  // Track hover exit
+                  style={{ cursor: "pointer", position: "relative" }}
+                >
                   <td>
-
                     <div className="stock-name">
-
                       <strong>{stock.name}</strong>
-
-                      <small>
-                        Equity
-                      </small>
-
+                      <small>Equity</small>
                     </div>
-
+                    
+                    {/* Floating action buttons when row is hovered */}
+                    {hoveredRow === index && (
+                      <div className="holdings-hover-actions" style={{ position: "absolute", right: "20px", background: "#fff", padding: "4px", borderRadius: "4px", boxShadow: "0 2px 5px rgba(0,0,0,0.15)" }}>
+                        <button 
+                          style={{ marginRight: "5px", backgroundColor: "#4caf50", color: "white", border: "none", padding: "3px 8px", borderRadius: "3px" }}
+                          onClick={() => openBuyWindow(stock.name)}
+                        >
+                          Buy
+                        </button>
+                        <button 
+                          style={{ backgroundColor: "#f44336", color: "white", border: "none", padding: "3px 8px", borderRadius: "3px" }}
+                          onClick={() => openSellWindow(stock)} // Passes whole object for maximum safety validations
+                        >
+                          Sell
+                        </button>
+                      </div>
+                    )}
                   </td>
-
                   <td>{stock.qty}</td>
-
                   <td>₹{stock.avg.toFixed(2)}</td>
-
                   <td>₹{stock.price.toFixed(2)}</td>
-
                   <td>₹{current.toFixed(2)}</td>
-
-                  <td
-                    className={
-                      pnl >= 0
-                        ? "profit"
-                        : "loss"
-                    }
-                  >
-                    ₹{pnl.toFixed(2)}
-                  </td>
-
-                  <td
-                    className={
-                      pnl >= 0
-                        ? "profit"
-                        : "loss"
-                    }
-                  >
-                    {stock.net}
-                  </td>
-
-                  <td
-                    className={
-                      stock.isLoss
-                        ? "loss"
-                        : "profit"
-                    }
-                  >
-                    {stock.day}
-                  </td>
-
+                  <td className={pnl >= 0 ? "profit" : "loss"}>₹{pnl.toFixed(2)}</td>
+                  <td className={pnl >= 0 ? "profit" : "loss"}>{stock.net}</td>
+                  <td className={stock.isLoss ? "loss" : "profit"}>{stock.day}</td>
                 </tr>
-
               );
-
             })}
-
           </tbody>
-
         </table>
-
       </div>
-
     </div>
   );
 };

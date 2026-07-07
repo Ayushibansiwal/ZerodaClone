@@ -1,45 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import axios from "axios";
+
 import { watchlist } from "../data/data";
 
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-
 import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 
 import { Tooltip, Grow } from "@mui/material";
 
+import GeneralContext from "./GeneralContext";
+
 const WatchList = () => {
-  const [search, setSearch] = useState("");
-
-  const filteredStocks = watchlist.filter((stock) =>
-    stock.name.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <div className="watchlist-container">
-      {/* Search */}
-
-      <div className="watchlist-search">
-        <SearchIcon className="search-icon" />
-
+      <div className="search-container">
         <input
           type="text"
-          placeholder="Search eg. INFY, TCS..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          name="search"
+          id="search"
+          placeholder="Search eg: infy, bse, nifty fut weekly"
+          className="search"
         />
-
-        <span>{filteredStocks.length}/50</span>
+        <span className="counts"> {watchlist.length} / 50</span>
       </div>
 
-      {/* Stocks */}
-
-      <div className="watchlist-items">
-        {filteredStocks.map((stock, index) => (
-          <WatchListItem stock={stock} key={index} />
-        ))}
+      <div className="watchlist-list">
+        {watchlist.map((stock, index) => {
+          return <WatchListItem stock={stock} key={index} />;
+        })}
       </div>
     </div>
   );
@@ -47,7 +38,7 @@ const WatchList = () => {
 
 export default WatchList;
 
-function WatchListItem({ stock }) {
+function WatchListItem({ stock, holding }) {
   const [showActions, setShowActions] = useState(false);
 
   return (
@@ -57,7 +48,6 @@ function WatchListItem({ stock }) {
       onMouseLeave={() => setShowActions(false)}
     >
       {/* Left */}
-
       <div className="watch-left">
         <h4>{stock.name}</h4>
 
@@ -73,56 +63,40 @@ function WatchListItem({ stock }) {
       </div>
 
       {/* Right */}
-
       <div className="watch-right">
         <h3>{stock.price}</h3>
       </div>
 
-      {/* Actions */}
-
-      {showActions && <WatchActions />}
+      {showActions && (
+        <WatchActions stock={stock} holding={holding} />
+      )}
     </div>
   );
 }
 
-function WatchActions() {
+function WatchActions({ stock, holding }) {
+  const generalContext = useContext(GeneralContext);
+
   return (
     <div className="watch-actions">
-      <Tooltip
-        title="Buy"
-        arrow
-        TransitionComponent={Grow}
-      >
-        <button className="buy-btn">
+      <Tooltip title="Buy" arrow TransitionComponent={Grow}>
+        <button
+          className="buy-btn"
+          onClick={() => generalContext.openBuyWindow(stock.name)}
+        >
           Buy
         </button>
       </Tooltip>
 
-      <Tooltip
-        title="Sell"
-        arrow
-        TransitionComponent={Grow}
-      >
-        <button className="sell-btn">
-          Sell
-        </button>
-      </Tooltip>
+      {/* Sell button block has been completely removed from here */}
 
-      <Tooltip
-        title="Analytics"
-        arrow
-        TransitionComponent={Grow}
-      >
+      <Tooltip title="Analytics" arrow TransitionComponent={Grow}>
         <button className="icon-btn">
           <ShowChartOutlinedIcon />
         </button>
       </Tooltip>
 
-      <Tooltip
-        title="More"
-        arrow
-        TransitionComponent={Grow}
-      >
+      <Tooltip title="More" arrow TransitionComponent={Grow}>
         <button className="icon-btn">
           <MoreHorizOutlinedIcon />
         </button>
