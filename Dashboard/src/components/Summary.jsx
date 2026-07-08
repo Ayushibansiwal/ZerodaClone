@@ -9,7 +9,7 @@ const Summary = () => {
   const [user, setUser] = useState(null);
   
     useEffect(() => {
-      fetch(`baseUrl/api/user`, { credentials: "include" })
+      fetch(`${baseUrl}/api/user`, { credentials: "include" })
         .then((res) => res.json())
         .then((data) => setUser(data))
         .catch((err) => console.error(err));
