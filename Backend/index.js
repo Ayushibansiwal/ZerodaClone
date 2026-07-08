@@ -14,6 +14,19 @@ import apiRoutes from "./Routes/apiRoutes.js";
 
 dotenv.config();
 
+const app = express();
+const PORT = process.env.PORT || 8000;
+const MONGODB_URL = process.env.MONGODB_URL;
+
+async function main() {
+    await mongoose.connect(MONGODB_URL);
+    console.log("✅ Database connected successfully.");
+}
+
+// Global Middleware
+const allowedOrigins = [
+  "https://zerodaclone-frontend.onrender.com/"
+];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -29,21 +42,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
-app.options('*', cors());
-
-const app = express();
-const PORT = process.env.PORT || 8000;
-const MONGODB_URL = process.env.MONGODB_URL;
-
-async function main() {
-    await mongoose.connect(MONGODB_URL);
-    console.log("✅ Database connected successfully.");
-}
-
-// Global Middleware
-const allowedOrigins = [
-  "https://zerodaclone-frontend.onrender.com/"
-];
+app.options('*', cors());  
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
