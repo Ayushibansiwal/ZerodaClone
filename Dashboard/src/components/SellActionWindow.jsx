@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import toast from "react-hot-toast"; // 1. Import toast
+import toast from "react-hot-toast"; 
 
 import GeneralContext from "./GeneralContext";
 
@@ -21,7 +21,7 @@ const SellActionWindow = ({ stock }) => {
     }
 
     try {
-      await axios.post("http://localhost:8000/api/sellOrder", {
+      await axios.post(`${baseUrl}/api/sellOrder`, {
         name: stock.name,
         qty: stockQuantity,
         price: stockPrice,
