@@ -6,6 +6,7 @@ import GeneralContext from "./GeneralContext";
 
 
 const BuyActionWindow = ({ uid }) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const generalContext = useContext(GeneralContext);
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(uid?.price || 0);
