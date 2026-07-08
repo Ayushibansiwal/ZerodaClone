@@ -10,7 +10,7 @@ import session from "express-session";
 import bcrypt from "bcrypt";
 
 import UserModel from "./models/UserModel.js";
-import apiRoutes from "./routes/apiRoutes.js"; 
+import apiRoutes from "./Routes/apiRoutes.js"; 
 
 dotenv.config();
 
