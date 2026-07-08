@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import GeneralContext from "./GeneralContext";
 
 const SellActionWindow = ({ stock }) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const generalContext = useContext(GeneralContext);
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0);
