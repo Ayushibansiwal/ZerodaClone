@@ -27,13 +27,12 @@ async function main() {
 const allowedOrigins = [
   "https://zerodaclone-frontend.onrender.com/"
 ];
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+      return callback(new Error('CORS error'), false);
     }
     return callback(null, true);
   },
@@ -42,7 +41,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
-app.options('*', cors());  
+app.options('*', cors());
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
