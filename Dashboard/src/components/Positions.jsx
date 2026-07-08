@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import axios from "axios";
 
 const Positions = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [allPositions, setAllPositions] = useState([]);
   useEffect(()=>{
     axios.get(`${baseUrl}/api/allPositions`,{ withCredentials: true })
