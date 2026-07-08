@@ -10,7 +10,7 @@ import axios from "axios";
 const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
   useEffect(()=>{
-    axios.get("http://localhost:8000/api/allPositions",{ withCredentials: true })
+    axios.get(`${baseUrl}/api/allPositions`,{ withCredentials: true })
     .then((res)=>{
         setAllPositions(res.data);
     })
