@@ -9,6 +9,7 @@ import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 
 const Menu = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [user, setUser] = useState(null);
 
   useEffect(() => {
