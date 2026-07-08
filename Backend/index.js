@@ -25,7 +25,7 @@ async function main() {
 
 // Global Middleware
 const allowedOrigins = [
-  "https://zerodaclone-frontend.onrender.com/"
+  "https://zerodaclone-frontend.onrender.com"
 ];
 
 app.use(cors({
