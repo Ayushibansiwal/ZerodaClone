@@ -19,7 +19,7 @@ const BuyActionWindow = ({ uid }) => {
       return;
     }
     try {
-       await axios.post("http://localhost:8000/api/newOrder", {
+       await axios.post(`${baseUrl}/api/newOrder`, {
         name: uid.name,
         qty: stockQuantity,
         price: stockPrice,
