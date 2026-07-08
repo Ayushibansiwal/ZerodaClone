@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {Link} from "react-router-dom";
 
 const Login = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -11,7 +12,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch(`${baseUrl}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -21,7 +22,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        window.location.href = 'http://localhost:5174';
+        window.location.href = import.meta.env.VITE_FRONTEND_URL;
       } else {
         setError(data.message || 'Invalid username or password');
       }

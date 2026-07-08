@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 
 
 const Signup = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +15,7 @@ const Signup = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/signup', {
+      const response = await fetch(`${baseUrl}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({username, password })
@@ -26,7 +27,7 @@ const Signup = () => {
         setIsSuccess(true);
         setMessage('Account created successfully! Redirecting to login...');
         setTimeout(() => {
-          window.location.href = '/login'; // Redirects back to your login route
+          window.location.href = '/login'; 
         }, 2000);
       } else {
         setIsSuccess(false);
