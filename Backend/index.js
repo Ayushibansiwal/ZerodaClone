@@ -41,7 +41,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
-app.options('*', cors());
+// Change '*' to /.*/ 
+app.options(/.*/, cors());
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
