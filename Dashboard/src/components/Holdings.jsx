@@ -8,6 +8,7 @@ import { VerticalChart } from "./VerticalChart";
 import { backgroundColor } from "@mui/system";
 
 const Holdings = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [allHoldings, setAllHoldings] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
   
