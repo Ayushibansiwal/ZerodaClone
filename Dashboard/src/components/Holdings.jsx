@@ -14,7 +14,7 @@ const Holdings = () => {
   const { openBuyWindow, openSellWindow } = useContext(GeneralContext);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/allHoldings", { withCredentials: true })
+    axios.get(`${baseUrl}/api/allHoldings`, { withCredentials: true })
     .then((res) => setAllHoldings(res.data))
     .catch((err) => console.error("Failed to fetch holdings:", err));
   }, []);
