@@ -12,8 +12,37 @@ import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import { Tooltip, Grow } from "@mui/material";
 
 import GeneralContext from "./GeneralContext";
+import { DoughnutChart } from "./DoughnutChart";
+
+const labels  = watchlist.map((subArray)=> subArray["name"]);
 
 const WatchList = () => {
+ const data = {
+  labels,
+  datasets: [
+    {
+      label: "price",
+      data:watchlist.map((stock)=>stock.price),
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.5)',
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 206, 86, 0.5)',
+        'rgba(75, 192, 192, 0.5)',
+        'rgba(153, 102, 255, 0.5)',
+        'rgba(255, 159, 64, 0.5)',
+      ],
+      borderColor: [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+      ],
+      borderWidth: 1,
+    },
+  ],
+ }
   return (
     <div className="watchlist-container">
       <div className="search-container">
@@ -32,6 +61,8 @@ const WatchList = () => {
           return <WatchListItem stock={stock} key={index} />;
         })}
       </div>
+
+      <DoughnutChart data={data}/>
     </div>
   );
 };
@@ -82,13 +113,12 @@ function WatchActions({ stock, holding }) {
       <Tooltip title="Buy" arrow TransitionComponent={Grow}>
         <button
           className="buy-btn"
-          onClick={() => generalContext.openBuyWindow(stock.name)}
+          onClick={() => 
+          generalContext.openBuyWindow(stock)}
         >
           Buy
         </button>
       </Tooltip>
-
-      {/* Sell button block has been completely removed from here */}
 
       <Tooltip title="Analytics" arrow TransitionComponent={Grow}>
         <button className="icon-btn">

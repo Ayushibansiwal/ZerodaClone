@@ -10,17 +10,19 @@ import axios from "axios";
 const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
   useEffect(()=>{
-    axios.get("http://localhost:8000/allPositions")
+    axios.get("http://localhost:8000/api/allPositions",{ withCredentials: true })
     .then((res)=>{
         setAllPositions(res.data);
-    });
+    })
+    .catch((err) => console.error("Failed to fetch holdings:", err));
   },[]);
-  const invested = positions.reduce(
+
+  const invested = allPositions.reduce(
     (acc, stock) => acc + stock.avg * stock.qty,
     0
   );
 
-  const current = positions.reduce(
+  const current = allPositions.reduce(
     (acc, stock) => acc + stock.price * stock.qty,
     0
   );

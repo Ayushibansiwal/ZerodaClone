@@ -1,27 +1,39 @@
 import React, { useState, useEffect, useContext } from "react";
 import { holdings } from "../data/data";
-import GeneralContext from "./GeneralContext"; // 1. Import Context
-
+import GeneralContext from "./GeneralContext"; 
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import axios from "axios";
+import { VerticalChart } from "./VerticalChart";
+import { backgroundColor } from "@mui/system";
 
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null); // State to track which row is hovered
+  const [hoveredRow, setHoveredRow] = useState(null);
   
-  const { openBuyWindow, openSellWindow } = useContext(GeneralContext); // 2. Use Context functions
+  const { openBuyWindow, openSellWindow } = useContext(GeneralContext);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/allHoldings").then((res) => {
-      setAllHoldings(res.data);
-    });
+    axios.get("http://localhost:8000/api/allHoldings", { withCredentials: true })
+    .then((res) => setAllHoldings(res.data))
+    .catch((err) => console.error("Failed to fetch holdings:", err));
   }, []);
 
-  const totalInvestment = holdings.reduce((acc, stock) => acc + stock.avg * stock.qty, 0);
-  const currentValue = holdings.reduce((acc, stock) => acc + stock.price * stock.qty, 0);
+  console.log(allHoldings);
+  const totalInvestment = allHoldings.reduce((acc, stock) => acc + stock.avg * stock.qty, 0);
+  const currentValue = allHoldings.reduce((acc, stock) => acc + stock.price * stock.qty, 0);
   const totalPnL = currentValue - totalInvestment;
   const totalPercent = ((totalPnL / totalInvestment) * 100).toFixed(2);
+
+  const labels = allHoldings.map((subArray)=> subArray["name"]);
+  const data = {
+    labels,
+    datasets:[{
+      label:"Stock Price",
+      data:allHoldings.map((stock) => stock.price),
+      backgroundColor: "rgba(255,99,132,0.5)"
+    }]
+  }
 
   return (
     <div className="holdings-container">
@@ -116,6 +128,8 @@ const Holdings = () => {
           </tbody>
         </table>
       </div>
+
+      <VerticalChart data={data}/>
     </div>
   );
 };

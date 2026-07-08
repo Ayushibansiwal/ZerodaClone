@@ -1,18 +1,20 @@
+// index.js
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import session from "express-session";
+import bcrypt from "bcrypt";
 
-// Models
-import HoldingsModel from "./models/HoldingsModel.js";
-import PositionModel from "./models/PositionModel.js";
-import OrderModel from "./models/OrderModel.js";
+import UserModel from "./models/UserModel.js";
+import apiRoutes from "./routes/apiRoutes.js"; 
 
 dotenv.config();
 
 const app = express();
-
 const PORT = process.env.PORT || 8000;
 const MONGODB_URL = process.env.MONGODB_URL;
 
@@ -21,146 +23,65 @@ async function main() {
     console.log("✅ Database connected successfully.");
 }
 
-app.use(cors());
+// Global Middleware
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 app.use(bodyParser.json());
-
-// Fetching Data from DB
-app.get("/allHoldings", async (req, res) => {
-    const allHoldings = await HoldingsModel.find();
-    res.send(allHoldings);
-});
-
-app.get("/holding/:name", async (req, res) => {
-  try {
-    const holding = await HoldingsModel.findOne({
-      name: req.params.name,
-    });
-
-    if (!holding) {
-      return res.status(404).json({
-        message: "Holding not found",
-      });
-    }
-
-    res.json(holding);
-  } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+app.use(express.urlencoded({ extended: false }));
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true,
+    secure: false, 
+    sameSite: 'lax'
   }
-});
+}));
 
-app.get("/allPositions", async (req, res) => {
-    const allPositions = await PositionModel.find();
-    res.send(allPositions);
-});
+// Passport Core Setup
+app.use(passport.initialize());
+app.use(passport.session());
 
-// BUY ORDER ROUTE
-app.post("/newOrder", async (req, res) => {
+passport.use(new LocalStrategy(async (username, password, done) => {
   try {
-    const { name, mode } = req.body;
+    const user = await UserModel.findOne({ username });
+    if (!user) return done(null, false, { message: 'Incorrect username.' });
     
-    // Explicitly parse inputs as clean numbers to avoid MongoDB string pollution
-    const qty = Number(req.body.qty);
-    const price = Number(req.body.price);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
 
-    const newOrder = new OrderModel({
-        name,
-        qty,
-        price,
-        mode
-    });
-    await newOrder.save();
-
-    const existingHolding = await HoldingsModel.findOne({ name });
-
-    if (existingHolding) {
-      const currentQty = Number(existingHolding.qty);
-      const currentAvg = Number(existingHolding.avg);
-
-      const totalCost = (currentAvg * currentQty) + (price * qty);
-      existingHolding.qty = currentQty + qty;
-      existingHolding.avg = totalCost / (currentQty + qty); // Update average cost price
-      await existingHolding.save();
-    } else {
-      const newHolding = new HoldingsModel({
-        name,
-        qty: qty,
-        avg: price,
-        price: price, 
-        net: "+0.00%",
-        day: "+0.00%",
-        isLoss: false
-      });
-      await newHolding.save();
-    }
-
-    res.status(201).json({ message: "Order placed and portfolio updated successfully" });
+    return done(null, user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return done(err);
   }
-});
+}));
 
-// SELL ORDER ROUTE (FIXED)
-app.post("/sellOrder", async (req, res) => {
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
   try {
-    const { name, mode } = req.body;
-    const qty = Number(req.body.qty);
-    const price = Number(req.body.price);
-
-    const holding = await HoldingsModel.findOne({ name });
-
-    if (!holding) {
-      return res.status(404).json({
-        message: "Stock not found in your portfolio",
-      });
-    }
-
-    const currentHoldingQty = Number(holding.qty);
-
-    if (currentHoldingQty < qty) {
-      return res.status(400).json({
-        message: "Not enough shares to sell",
-      });
-    }
-
-    // Calculate new total quantity balance
-    const updatedQty = currentHoldingQty - qty;
-
-    if (updatedQty <= 0) {
-      // 🚀 CRITICAL FIX: Explicitly drop row completely if balance drops to or below 0
-      await HoldingsModel.deleteOne({ name });
-    } else {
-      holding.qty = updatedQty;
-      await holding.save();
-    }
-
-    // Save order history log
-    const sellOrder = new OrderModel({
-      name,
-      qty,
-      price,
-      mode,
-    });
-    await sellOrder.save();
-
-    res.json({
-      message: "Sell order executed successfully",
-    });
-
+    const user = await UserModel.findById(id);
+    done(null, user);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    done(err, null);
   }
 });
+
+app.use("/api", apiRoutes); 
 
 main()
 .then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 Server listening on port ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`🚀 Server listening on port ${PORT}`));
 })
-.catch((err) => {
-    console.log("❌ Database connection error:", err);
-});
+.catch((err) => console.log("❌ Database connection error:", err));

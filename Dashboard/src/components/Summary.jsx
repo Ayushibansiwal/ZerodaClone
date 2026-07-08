@@ -1,18 +1,24 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 
 const Summary = () => {
+  const [user, setUser] = useState(null);
+  
+    useEffect(() => {
+      fetch("http://localhost:8000/api/user", { credentials: "include" })
+        .then((res) => res.json())
+        .then((data) => setUser(data))
+        .catch((err) => console.error(err));
+    }, []);
+
   return (
     <div className="summary-container">
-
-      {/* Welcome Section */}
-
       <div className="welcome-card">
         <div>
-          <h2>Good Morning, Ayushi 👋</h2>
+          <h2 className="fs-4">Good Morning,  {user?.username || "Guest"}👋</h2>
           <p>Here's a quick overview of your portfolio today.</p>
         </div>
 

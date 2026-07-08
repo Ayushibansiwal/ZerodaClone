@@ -13,8 +13,8 @@ export const GeneralContextProvider = (props) => {
   const [windowType, setWindowType] = useState(null); 
   const [selectedStock, setSelectedStock] = useState(null);
 
-  const handleOpenBuyWindow = (uid) => {
-    setSelectedStock(uid); 
+  const handleOpenBuyWindow = (stock) => {
+    setSelectedStock(stock); 
     setWindowType("BUY");
   };
   

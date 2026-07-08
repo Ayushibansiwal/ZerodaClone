@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
@@ -6,10 +6,18 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import CandlestickChartOutlinedIcon from "@mui/icons-material/CandlestickChartOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 
 const Menu = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/user", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch((err) => console.error(err));
+  }, []);
+  
   const location = useLocation();
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -40,12 +48,21 @@ const Menu = () => {
       path: "/funds",
       icon: <SavingsOutlinedIcon fontSize="small" />,
     },
-    {
-      name: "Apps",
-      path: "/apps",
-      icon: <AppsOutlinedIcon fontSize="small" />,
-    },
   ];
+
+  const handleLogout = async () => {
+  try {
+    const response = await fetch("http://localhost:8000/api/logout", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (response.ok) {
+      window.location.href = "http://localhost:5173/login"; 
+    }
+  } catch (err) {
+    console.error("Logout failed:", err);
+  }
+};
 
   return (
     <header className="menu-container">
@@ -74,12 +91,9 @@ const Menu = () => {
         className="profile-section"
         onClick={() => setProfileOpen(!profileOpen)}
       >
-        <div className="avatar">
-          A
-        </div>
-
+        <div className="avatar">{user?.username?.[0]?.toUpperCase() || "?"}</div>
         <div className="profile-info">
-          <h5>Ayushi</h5>
+          <h5>{user?.username || "Guest"}</h5>
           <small>Investor</small>
         </div>
 
@@ -93,7 +107,7 @@ const Menu = () => {
             <p>Settings</p>
             <p>Reports</p>
             <hr />
-            <p className="logout">Logout</p>
+            <p className="logout" onClick={handleLogout}>Logout</p>
           </div>
         )}
       </div>

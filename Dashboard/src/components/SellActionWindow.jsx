@@ -4,7 +4,6 @@ import axios from "axios";
 import toast from "react-hot-toast"; // 1. Import toast
 
 import GeneralContext from "./GeneralContext";
-import "./BuyActionWindow.css";
 
 const SellActionWindow = ({ stock }) => {
   const generalContext = useContext(GeneralContext);
@@ -22,12 +21,12 @@ const SellActionWindow = ({ stock }) => {
     }
 
     try {
-      await axios.post("http://localhost:8000/sellOrder", {
+      await axios.post("http://localhost:8000/api/sellOrder", {
         name: stock.name,
         qty: stockQuantity,
         price: stockPrice,
         mode: "SELL",
-      });
+      }, { withCredentials: true });
 
       generalContext.closeWindow();
       
