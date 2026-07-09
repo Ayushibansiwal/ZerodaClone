@@ -1,87 +1,99 @@
-// index.js
 import express from "express";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
-import bodyParser from "body-parser";
 import cors from "cors";
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
 import session from "express-session";
-import bcrypt from "bcrypt";
+import MongoStore from "connect-mongo";
 
-import UserModel from "./models/UserModel.js";
-import apiRoutes from "./Routes/apiRoutes.js"; 
+import passport from "./config/passport.js";
+import connectDB from "./config/database.js";
+
+import errorHandler from "./middleware/errorHandler.js";
+
+// Routes
+import authRoutes from "./routes/authRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import holdingRoutes from "./routes/holdingRoutes.js";
+import positionRoutes from "./routes/positionRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+
+// ======================================
+// Environment Variables
+// ======================================
+
+const PORT = process.env.PORT || 3000;
 const MONGODB_URL = process.env.MONGODB_URL;
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
-async function main() {
-    await mongoose.connect(MONGODB_URL);
-    console.log("✅ Database connected successfully.");
-}
+// ======================================
+// Database
+// ======================================
 
-// Global Middleware
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+await connectDB();
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
-}));
-app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24,
-    httpOnly: true,
-    secure: false, 
-    sameSite: 'lax'
-  }
-}));
+app.use(express.json());
 
-// Passport Core Setup
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ],
+    credentials: true,
+  })
+);
+
+// ======================================
+// Session
+// ======================================
+
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+
+    store: MongoStore.create({
+      mongoUrl: MONGODB_URL,
+    }),
+
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      secure: false,
+    },
+  })
+);
+
+// ======================================
+// Passport
+// ======================================
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(async (username, password, done) => {
-  try {
-    const user = await UserModel.findOne({ username });
-    if (!user) return done(null, false, { message: 'Incorrect username.' });
-    
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
+// ======================================
+// Routes
+// ======================================
 
-    return done(null, user);
-  } catch (err) {
-    return done(err);
-  }
-}));
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/holdings", holdingRoutes);
+app.use("/api/positions", positionRoutes);
+app.use("/api/user", userRoutes);
 
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await UserModel.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
 });
 
-app.use("/api", apiRoutes); 
+app.use(errorHandler);
 
-main()
-.then(() => {
-    app.listen(PORT, () => console.log(`🚀 Server listening on port ${PORT}`));
-})
-.catch((err) => console.log("❌ Database connection error:", err));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
