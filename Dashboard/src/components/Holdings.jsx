@@ -8,13 +8,14 @@ import { VerticalChart } from "./VerticalChart";
 import { backgroundColor } from "@mui/system";
 
 const Holdings = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [allHoldings, setAllHoldings] = useState([]);
   const [hoveredRow, setHoveredRow] = useState(null);
   
   const { openBuyWindow, openSellWindow } = useContext(GeneralContext);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/allHoldings", { withCredentials: true })
+    axios.get(`${baseUrl}/api/allHoldings`, { withCredentials: true })
     .then((res) => setAllHoldings(res.data))
     .catch((err) => console.error("Failed to fetch holdings:", err));
   }, []);

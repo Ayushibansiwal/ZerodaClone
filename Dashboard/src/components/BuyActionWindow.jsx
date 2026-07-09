@@ -6,6 +6,7 @@ import GeneralContext from "./GeneralContext";
 
 
 const BuyActionWindow = ({ uid }) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const generalContext = useContext(GeneralContext);
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(uid?.price || 0);
@@ -19,7 +20,7 @@ const BuyActionWindow = ({ uid }) => {
       return;
     }
     try {
-       await axios.post("http://localhost:8000/api/newOrder", {
+       await axios.post(`${baseUrl}/api/newOrder`, {
         name: uid.name,
         qty: stockQuantity,
         price: stockPrice,

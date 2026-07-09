@@ -5,10 +5,11 @@ import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 
 const Summary = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [user, setUser] = useState(null);
   
     useEffect(() => {
-      fetch("http://localhost:8000/api/user", { credentials: "include" })
+      fetch(`${baseUrl}/api/user`, { credentials: "include" })
         .then((res) => res.json())
         .then((data) => setUser(data))
         .catch((err) => console.error(err));

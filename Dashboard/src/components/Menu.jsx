@@ -9,10 +9,11 @@ import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 
 const Menu = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/user", { credentials: "include" })
+    fetch(`${baseUrl}/api/user`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setUser(data))
       .catch((err) => console.error(err));
@@ -52,12 +53,12 @@ const Menu = () => {
 
   const handleLogout = async () => {
   try {
-    const response = await fetch("http://localhost:8000/api/logout", {
+    const response = await fetch(`${baseUrl}/api/logout`, {
       method: "GET",
       credentials: "include",
     });
     if (response.ok) {
-      window.location.href = "http://localhost:5173/login"; 
+      window.location.href = import.meta.env.VITE_FRONTEND_URL; 
     }
   } catch (err) {
     console.error("Logout failed:", err);

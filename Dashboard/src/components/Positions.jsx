@@ -8,9 +8,10 @@ import { useEffect } from "react";
 import axios from "axios";
 
 const Positions = () => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const [allPositions, setAllPositions] = useState([]);
   useEffect(()=>{
-    axios.get("http://localhost:8000/api/allPositions",{ withCredentials: true })
+    axios.get(`${baseUrl}/api/allPositions`,{ withCredentials: true })
     .then((res)=>{
         setAllPositions(res.data);
     })
